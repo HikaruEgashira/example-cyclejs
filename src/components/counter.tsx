@@ -57,7 +57,7 @@ function intent(DOM: DOMSource): DOMIntent {
 function view(state$: Stream<State>): Stream<VNode> {
     return state$.map(({ count }) => (
         <div>
-            <h2>My Awesome Cycle.js app - Page Counter</h2>
+            <h3>My Awesome Cycle.js app - Page Counter</h3>
             <span>{'Counter: ' + count}</span>
             <button type="button" className="add">
                 Increase

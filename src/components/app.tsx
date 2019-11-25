@@ -14,7 +14,7 @@ export interface State {
 
 export function App(sources: Sources<State>): Sinks<State> {
     const match$ = sources.router.define({
-        '/': isolate(Counter, 'counter')
+        '/counter': isolate(Counter, 'counter')
     });
     // → router
 
@@ -29,7 +29,7 @@ export function App(sources: Sources<State>): Sinks<State> {
 
     const redirect$: Stream<string> = sources.router.history$
         .filter((l: Location) => l.pathname === '/')
-        .mapTo('/');
+        .mapTo('/counter');
 
     const sinks = extractSinks(componentSinks$, driverNames);
     return {
