@@ -7,18 +7,16 @@ import { driverNames } from '../drivers';
 import { Sources, Sinks, Reducer, Component } from '../interfaces';
 
 import { Counter, State as CounterState } from './counter';
-import { Speaker, State as SpeakerState } from './speaker';
 
 export interface State {
     counter?: CounterState;
-    speaker?: SpeakerState;
 }
 
 export function App(sources: Sources<State>): Sinks<State> {
     const match$ = sources.router.define({
-        '/counter': isolate(Counter, 'counter'),
-        '/speaker': isolate(Speaker, 'speaker')
+        '/': isolate(Counter, 'counter')
     });
+    // → router
 
     const componentSinks$: Stream<Sinks<State>> = match$
         .filter(({ path, value }: any) => path && typeof value === 'function')
@@ -31,7 +29,7 @@ export function App(sources: Sources<State>): Sinks<State> {
 
     const redirect$: Stream<string> = sources.router.history$
         .filter((l: Location) => l.pathname === '/')
-        .mapTo('/counter');
+        .mapTo('/');
 
     const sinks = extractSinks(componentSinks$, driverNames);
     return {

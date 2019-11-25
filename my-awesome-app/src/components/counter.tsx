@@ -13,16 +13,14 @@ export const defaultState: State = {
 interface DOMIntent {
     increment$: Stream<null>;
     decrement$: Stream<null>;
-    link$: Stream<null>;
 }
 
 export function Counter({ DOM, state }: Sources<State>): Sinks<State> {
-    const { increment$, decrement$, link$ }: DOMIntent = intent(DOM);
+    const { increment$, decrement$ }: DOMIntent = intent(DOM);
 
     return {
         DOM: view(state.stream),
-        state: model(increment$, decrement$),
-        router: redirect(link$)
+        state: model(increment$, decrement$)
     };
 }
 
@@ -44,24 +42,6 @@ function model(
     return xs.merge(init$, add$, subtract$);
 }
 
-function view(state$: Stream<State>): Stream<VNode> {
-    return state$.map(({ count }) => (
-        <div>
-            <h2>My Awesome Cycle.js app - Page 1</h2>
-            <span>{'Counter: ' + count}</span>
-            <button type="button" className="add">
-                Increase
-            </button>
-            <button type="button" className="subtract">
-                Decrease
-            </button>
-            <button type="button" data-action="navigate">
-                Page 2
-            </button>
-        </div>
-    ));
-}
-
 function intent(DOM: DOMSource): DOMIntent {
     const increment$ = DOM.select('.add')
         .events('click')
@@ -71,13 +51,20 @@ function intent(DOM: DOMSource): DOMIntent {
         .events('click')
         .mapTo(null);
 
-    const link$ = DOM.select('[data-action="navigate"]')
-        .events('click')
-        .mapTo(null);
-
-    return { increment$, decrement$, link$ };
+    return { increment$, decrement$ };
 }
 
-function redirect(link$: Stream<any>): Stream<string> {
-    return link$.mapTo('/speaker');
+function view(state$: Stream<State>): Stream<VNode> {
+    return state$.map(({ count }) => (
+        <div>
+            <h2>My Awesome Cycle.js app - Page Counter</h2>
+            <span>{'Counter: ' + count}</span>
+            <button type="button" className="add">
+                Increase
+            </button>
+            <button type="button" className="subtract">
+                Decrease
+            </button>
+        </div>
+    ));
 }
