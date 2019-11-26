@@ -1,16 +1,30 @@
 import { run } from '@cycle/run';
 import xs from 'xstream';
-import { makeDOMDriver } from '@cycle/dom';
 import { html } from 'snabbdom-jsx';
+import { div, button, p, makeDOMDriver } from '@cycle/dom';
 
-function main(sources) {
-    const vdom$ = xs.of(
+function main(stream) {
+    // Intent
+    const action$ = xs.merge(
+        stream.DOM.select('.decrement').events('click').map(ev => -1),
+        stream.DOM.select('.increment').events('click').map(ev => +1)
+    );
+
+    // Model
+    const count$ = action$.fold((acc, x) => acc + x, 0);
+
+    // View
+    const view$ = count$.map(count =>
         <div>
-            <h1>Hello, world</h1>
+            <button className="decrement">decrement</button>
+            <button className="increment">increment</button>
+            <p>Counter: {count}</p>
         </div>
-    )
+    );
+
+    // Sinks
     return {
-        DOM: vdom$,
+        DOM: view$,
     };
 }
 
